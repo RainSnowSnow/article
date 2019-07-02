@@ -15,7 +15,7 @@ export default {
    * @description api请求基础路径
    */
 
-  baseUrl: 'http://192.168.0.201:8080/',
+  baseUrl: 'https://mockapi.eolinker.com/epXk1eW1f753c2c1348b165a502a620d367a2c47234f3ba/',
   /**
    * @description 默认打开的首页的路由name值，默认为home
    */

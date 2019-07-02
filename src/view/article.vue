@@ -440,7 +440,7 @@ export default {
                         this.formInline.title=data.title
                    
                         this.$refs.modifyContent.getContent(data.content)
-                             console.log(data.content)
+                  
                         this.modifyModal=true
                     }
 

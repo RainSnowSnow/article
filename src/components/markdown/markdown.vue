@@ -14,18 +14,22 @@ export default {
       type: String,
       default: ''
     },
+ 
     options: {
       type: Object,
       default: () => {
         return {
+              autofocus:false,
+              spellChecker: false,
             toolbar: ["bold", "italic", "heading", "|", "quote",'strikethrough','heading','code','unordered-list','ordered-list','clean-block','table','horizontal-rule','preview','side-by-side','fullscreen'] 
         }
       }
     },
     localCache: {
       type: Boolean,
-      default: true
+      default: false
     }
+   
   },
   data () {
     return {
@@ -34,21 +38,23 @@ export default {
     }
   },
    mounted () {
-    this.editor = new Simplemde(Object.assign(this.options, {
-      element: this.$refs.editor
-    }))
+ 
     /**
      * 事件列表为Codemirror编辑器的事件，更多事件类型，请参考：
      * https://codemirror.net/doc/manual.html#events
      */
-    this.addEvents()
+
     
     
   },
+  
   methods: {
   getContent(val){
+   this.editor = new Simplemde(Object.assign(this.options, {
+      element: this.$refs.editor
+    }))
     this.editor.value(val)
-   
+    
   },
     addEvents () {
       this.editor.codemirror.on('keyup',()=>{

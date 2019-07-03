@@ -164,11 +164,13 @@ export default {
                         type: 'index',
                         width: 60,
                         align: 'center'
+                   
                     },
                          {
                              title:'标题',
                              key:'title',
                              align: 'center',
+                         
                          },{
                              title:'发布日期',
                              key:'publishedAt',
@@ -208,7 +210,12 @@ export default {
                                           style:{
                                               display:params.row.state===5?'block':'none'
                                           }
-                                      },'已完成')
+                                      },'已完成'),
+                                         h('span',{
+                                          style:{
+                                              display:params.row.state===6?'block':'none'
+                                          }
+                                      },'已通过')
                                   ])
                               }
                          },{
@@ -294,11 +301,12 @@ export default {
                                         display:this.access==='sh2'?"inline-block":"none"
                                     },
                                      on:{
-                                        click:()=>{
-                                            this.$_shenhe2()
+                                        click:async ()=>{
+                                           await article.$_shenhe2(params.row.id)
+                                           await article.getArticle(this,this.TablePage.pageSize,0)   
                                         }
                                     },
-                                     },'审核2'),
+                                     },'终极审核'),
                                         h('Button',{
                                        props: {
                                         type: 'primary',
@@ -306,7 +314,7 @@ export default {
                                     },
                                      style:{
                                         marginRight:'5px',
-                                       display:params.row.state===5?"inline-block":"none"
+                                       display:params.row.state===6?"inline-block":"none"
                                     },
                                     on:{
                                         click:()=>{
@@ -321,7 +329,7 @@ export default {
                                     },
                                      style:{
                                          marginRight:'5px',
-                                         display:params.row.state===5?"inline-block":"none"
+                                         display:params.row.state===6?"inline-block":"none"
                                     },
                                     on:{
                                         click:()=>{
@@ -336,7 +344,7 @@ export default {
                                     },
                                      style:{
                                         marginRight:'5px',
-                                        display:this.access==='zz'?"inline-block":'none'
+                                        display:this.access==='zz'&& params.row.state===5?"inline-block":'none'
                                     },
                                     on:{
                                         click:()=>{
@@ -351,7 +359,7 @@ export default {
                                          this.articleId=params.row.id
                                         }
                                     }
-                                     },'开始制作')
+                                     },'上传视频')
                                  ] )
                              }
                          }
@@ -433,7 +441,7 @@ export default {
                               this.$refs[name].validate(async(valid) => {
                                         if (valid) {
                                           
-                                            await  article.$_Made(this.articleId,this.formInlineMade,this)
+                                            await  article.$_Made(this.articleId,this.formInlineMade)
                                             await  article.getArticle(this,this.TablePage.pageSize,0)
 
                                             this.madeModal=false

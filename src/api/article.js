@@ -13,7 +13,13 @@ export default {
             url:"/articles",
             data:query
              })  
-             vm.Data=data.rows
+          
+              vm.Data= data.rows.map((o)=>{
+                if(o.state===6){
+                    o['_disabled']=true
+                }
+                return o
+           })
               vm.DataCount=data.count
      } catch(error){
             console.log(error)
@@ -62,7 +68,7 @@ export default {
         })
     },
     /* 开始制作 */
-    async $_Made(id,query,vm){
+    async $_Made(id,query){
         try{
             await http.patch({
                 url: `/articles/${id}/end`,
@@ -80,17 +86,16 @@ export default {
             await http.patch({
                 url:`/articles/${id}/verify1`,
             })
-            this.$Message.info('审核成功')
+            iview.$Message.info('审核成功')
         }catch(error){
             console.log('审核失败')
         }
      
     },
     /* 审核2 */
-    async shenhe2(){
-        await http.put({
-            url:'',
-            data:query
+    async $_shenhe2(id){
+        await http.patch({
+            url:`/articles/${id}/verify2`,
         })
     }
 }

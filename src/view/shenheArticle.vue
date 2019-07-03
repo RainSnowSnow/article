@@ -175,7 +175,12 @@ export default {
                                           style:{
                                               display:params.row.state===5?'block':'none'
                                           }
-                                      },'已完成')
+                                      },'已完成'),
+                                        h('span',{
+                                          style:{
+                                              display:params.row.state===6?'block':'none'
+                                          }
+                                      },'已通过')
                                   ])
                               }
                          },{
@@ -273,7 +278,7 @@ export default {
                                     },
                                      style:{
                                         marginRight:'5px',
-                                       display:params.row.state===5?"inline-block":"none"
+                                       display:params.row.state===6?"inline-block":"none"
                                     },
                                     on:{
                                         click:()=>{
@@ -288,7 +293,7 @@ export default {
                                     },
                                      style:{
                                          marginRight:'5px',
-                                         display:params.row.state===5?"inline-block":"none"
+                                         display:params.row.state===6?"inline-block":"none"
                                     },
                                     on:{
                                         click:()=>{

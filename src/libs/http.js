@@ -3,7 +3,7 @@ import Axios from 'axios'
 import config from '@/config'
 import * as Util from '@/libs/util'
 import Cookie from 'js-cookie'
-
+import iview from 'iview'
 const baseUrl = config.baseUrl
 const axios = Axios.create({
   baseURL: baseUrl,
@@ -19,10 +19,11 @@ function ajax (options) {
     axios(options).then(res => {
 
       if (res.status === 200) {
-               if (res.data.code === 0) {
+         if (res.data.code === 0) {
           resolve(res.data.data)
         } else {
           Cookie.set('error', res.data.msg)
+         iview.Message.info(res.data.msg)
           reject(new Error(res.data.msg)
           )
         }

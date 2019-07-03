@@ -76,10 +76,17 @@ export default {
    
             Util.setToken(data.token)
             this.$store.commit('setAccess',data.rule)
-       
+          if(data.rule==='sh1'){
+           this.$router.push({
+                name: 'shenhe'
+              })
+          }else{
             this.$router.push({
                 name: 'articlePage'
               })
+          
+          }
+         
            }catch(error){
              console.log(error)
            }

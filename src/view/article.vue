@@ -41,8 +41,8 @@
                </FormItem>
             </Form>
           <div slot="footer">
-            <Button type="primary"    @click="modifyArticle('formInline',1,modifyId)">草稿</Button>
-            <Button type="primary"   @click="modifyArticle('formInline',2,modifyId)">发布</Button>
+            <Button type="primary"    @click="modifyArticle('formInline',1,modifyId)">保存</Button>
+         
         </div>
       </Modal>
        <Modal v-model="downModal" title="下载" @on-ok="downModal===false" @on-cancel="downModal===false">
@@ -159,7 +159,8 @@ export default {
                     pageSize: 30,
                     pageSizeOpts: [30, 50, 80, 100]
                 },
-            Columns:[{
+            Columns:[
+                  {
                         type: 'index',
                         width: 60,
                         align: 'center'
@@ -185,9 +186,9 @@ export default {
                                   return h('div',[
                                       h('span',{
                                           style:{
-                                              display:params.row.state===3?'block':'none'
+                                              display:params.row.state===9?'block':'none'
                                           }
-                                      },'已审核'),
+                                      },'已审核,等待制作'),
                                        h('span',{
                                           style:{
                                               display:params.row.state===1?'block':'none'
@@ -223,7 +224,7 @@ export default {
                                     },
                                     style:{
                                         marginRight:'5px',
-                                         display:this.access==='zj'?"inline-block":"none"
+                                         display:this.access==='zj' && params.row.state===1?"inline-block":"none"
                                     },
                                     on:{
                                         click:()=>{
@@ -242,8 +243,10 @@ export default {
                                          display:this.access==='zj'?"inline-block":"none"
                                     },
                                     on:{
-                                        click:()=>{
-                                           this.$_delete(params.row.id)
+                                        click:async ()=>{
+                                           await article.$_deleteArticle(params.row.id)
+                                           await article.getArticle(this,this.TablePage.pageSize,0)
+        
                                         }
                                         
                                     },
@@ -255,11 +258,13 @@ export default {
                                     },
                                      style:{
                                         marginRight:'5px',
-                                         display:this.access==='zj'?"inline-block":"none"
+                                         display:this.access==='zj' && params.row.state!==2?"inline-block":"none"
                                     },
                                     on:{
-                                        click:()=>{
-                                            this.$_fabu(params.row.id)
+                                        click:async ()=>{
+                                          await  article.$_fabu(params.row.id) 
+                                          await article.getArticle(this,this.TablePage.pageSize,0)   
+                                              
                                         }
                                     }
                                      },'发布'),
@@ -273,8 +278,9 @@ export default {
                                          display:this.access==='sh1'?"inline-block":"none"
                                     },
                                     on:{
-                                        click:()=>{
-                                            this.$_shenhe1()
+                                        click:async ()=>{
+                                             await article.$_shenhe1(params.row.id)
+                                              await article.getArticle(this,this.TablePage.pageSize,0)   
                                         }
                                     },
                                      },'审核1'),
@@ -300,7 +306,7 @@ export default {
                                     },
                                      style:{
                                         marginRight:'5px',
-                                         display:(this.access==='zj')|| (this.access==='admin')?"inline-block":"none"
+                                       display:params.row.state===5?"inline-block":"none"
                                     },
                                     on:{
                                         click:()=>{
@@ -314,8 +320,8 @@ export default {
                                         size: 'small'
                                     },
                                      style:{
-                                        marginRight:'5px',
-                                         display:(this.access==='zj'|| this.access==='admin' || this.access==='sh1')?"inline-block":"none"
+                                         marginRight:'5px',
+                                         display:params.row.state===5?"inline-block":"none"
                                     },
                                     on:{
                                         click:()=>{
@@ -334,6 +340,13 @@ export default {
                                     },
                                     on:{
                                         click:()=>{
+                                            if(params.row.baiduPwd!=''){
+                                                this.formInlineMade={
+                                                    mp4Url:params.row.mp4Url,
+                                                    baiduUrl:params.row.baiduUrl,
+                                                    baiduPwd:params.row.baiduPwd
+                                                }
+                                            }
                                          this.madeModal=true
                                          this.articleId=params.row.id
                                         }
@@ -388,11 +401,11 @@ export default {
                  async modifyArticle(name,state,id){
                        this.$refs[name].validate(async(valid) => {
                          if (valid) {
-                             let content=this.$refs.childContent.content
+                             let content=this.$refs.modifyContent.content
                              let title=this.formInline.title
-                             await article.modifyArticle(title,content,state)
+                             await article.modifyArticle(id,title,content)
                              await article.getArticle(this,this.TablePage.pageSize,0)
-                           this.modal=false
+                               this.modifyModal=false
                               this.$Message.success('提交成功');
 
                             } else {
@@ -400,12 +413,7 @@ export default {
                             }
                                     })
                     },
-                     $_delete(id){
-                           article.$_deleteArticle(id)
-                    },
-                     $_fabu(id){
-                      article.$_fabu(id)    
-                    },
+            
                     $_down(data){
                         this.formInlineDown={
                             mp4Url:data.mp4Url,
@@ -422,15 +430,16 @@ export default {
                        this.playModal=true
                     },
                     MadeSubmit(name){
-                              this.$refs[name].validate((valid) => {
+                              this.$refs[name].validate(async(valid) => {
                                         if (valid) {
                                           
-                                            article.$_Made(this.articleId,this.formInlineMade)
-                                            this.$Message.success('提交成功');
-                                            this.madeModal=true
+                                            await  article.$_Made(this.articleId,this.formInlineMade,this)
+                                            await  article.getArticle(this,this.TablePage.pageSize,0)
+
+                                            this.madeModal=false
                                         } else {
                                             this.$Message.error('请完善信息');
-                                            this.madeModal=false
+                                            this.madeModal=true
                                   
                                         }
                                     })      

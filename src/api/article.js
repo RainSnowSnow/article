@@ -1,4 +1,7 @@
 import http from '@/libs/http.js'
+import iview from 'iview'
+
+// import { try } from 'q';
 export default {
     /* 获取文章列表 */
     async getArticle(vm,limit,offset){
@@ -11,7 +14,7 @@ export default {
             data:query
              })  
              vm.Data=data.rows
-   
+              vm.DataCount=data.count
      } catch(error){
             console.log(error)
         }
@@ -34,9 +37,14 @@ export default {
     
     },
     /* 修改文章 */
-   async modifyArticle(id,query){
+   async modifyArticle(id,title,content){
+       console.log(id)
+       let query={
+           title:title,
+           content:content
+       }
        await http.put({
-           url:``,
+           url:`/articles/${id}`,
            data:query
        })
    },
@@ -44,28 +52,39 @@ export default {
     /* 删除文章 */
     async $_deleteArticle(id){
         await http.delete({
-            url:``
+            url:`/articles/${id}`
         })
     },
     /* 发布文章 */
     async $_fabu(id){
-        await http.post({
-            url:``
+        await http.patch({
+            url:`/articles/${id}/publish`
         })
     },
     /* 开始制作 */
-    async $_Made(id,query){
-       await http.post({
-           url: ``,
-           data:query
-       })
+    async $_Made(id,query,vm){
+        try{
+            await http.patch({
+                url: `/articles/${id}/end`,
+                data:query
+            })
+           iview.Message.info('制作成功')
+        }catch(error){
+           console.log(error)
+        }
+   
     },
     /* 审核1 */
-    async shenhe1(){
-        await http.put({
-            url:'',
-            data:query
-        })
+    async $_shenhe1(id){
+        try{
+            await http.patch({
+                url:`/articles/${id}/verify1`,
+            })
+            this.$Message.info('审核成功')
+        }catch(error){
+            console.log('审核失败')
+        }
+     
     },
     /* 审核2 */
     async shenhe2(){

@@ -35,6 +35,17 @@ export default new Router({
         component: () =>
           import ('@/view/profession.vue')
       }],
+    },
+    {
+      path: '/shenhe',
+      name: 'Main',
+      component: Main,
+      children:[{
+        name:"shenhe",
+        path:'shenhe',
+        component: () =>
+          import ('@/view/shenheArticle.vue')
+      }],
     }
   ]
 })

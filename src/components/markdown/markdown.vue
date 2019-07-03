@@ -35,7 +35,8 @@ export default {
   data () {
     return {
       editor: null,
-      length:null
+      length:null,
+      content:null
     }
   },
    mounted () {
@@ -57,6 +58,7 @@ export default {
   getContent(val){
          this.$nextTick(() => {
             this.editor.value(val)
+            this.content=val
       });
     
 
@@ -67,12 +69,13 @@ export default {
           this.editor.codemirror.on('keyup',(event)=>{ 
               var reg = /[\u4e00-\u9fa5a-zA-Z]/g
               var content=this.editor.value().match(reg)
+              this.content=this.editor.value()
               var length=content.length
              if(isActive){
   
               if(length>160){
                 this.$Message.info('超出字数限制(160字数)')
-              this.editor.codemirror.options.readOnly='nocursor'
+                 this.editor.codemirror.options.readOnly='nocursor'
             
                 isActive=false
               }

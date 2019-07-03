@@ -32,6 +32,46 @@ export default {
            console.log(error)
         }
     
+    },
+    /* 修改文章 */
+   async modifyArticle(id,query){
+       await http.put({
+           url:``,
+           data:query
+       })
+   },
+
+    /* 删除文章 */
+    async $_deleteArticle(id){
+        await http.delete({
+            url:``
+        })
+    },
+    /* 发布文章 */
+    async $_fabu(id){
+        await http.post({
+            url:``
+        })
+    },
+    /* 开始制作 */
+    async $_Made(id,query){
+       await http.post({
+           url: ``,
+           data:query
+       })
+    },
+    /* 审核1 */
+    async shenhe1(){
+        await http.put({
+            url:'',
+            data:query
+        })
+    },
+    /* 审核2 */
+    async shenhe2(){
+        await http.put({
+            url:'',
+            data:query
+        })
     }
-   
 }

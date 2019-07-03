@@ -1,6 +1,6 @@
 <template>
   <div class="markdown-wrapper">
-    <textarea ref="editor" ></textarea>
+    <textarea ref="editor"   ></textarea>
   </div>
 </template>
 
@@ -14,12 +14,13 @@ export default {
       type: String,
       default: ''
     },
- 
+   
     options: {
       type: Object,
       default: () => {
         return {
-              autofocus:false,
+       
+           status: false,
               spellChecker: false,
             toolbar: ["bold", "italic", "heading", "|", "quote",'strikethrough','heading','code','unordered-list','ordered-list','clean-block','table','horizontal-rule','preview','side-by-side','fullscreen'] 
         }
@@ -34,7 +35,7 @@ export default {
   data () {
     return {
       editor: null,
-      content:null
+      length:null
     }
   },
    mounted () {
@@ -43,50 +44,43 @@ export default {
      * 事件列表为Codemirror编辑器的事件，更多事件类型，请参考：
      * https://codemirror.net/doc/manual.html#events
      */
-
-    
+   this.editor = new Simplemde(Object.assign(this.options, {
+      element: this.$refs.editor
+    }))
+  
+   
+    this.addEvents()
     
   },
   
   methods: {
   getContent(val){
-   this.editor = new Simplemde(Object.assign(this.options, {
-      element: this.$refs.editor
-    }))
-    this.editor.value(val)
+         this.$nextTick(() => {
+            this.editor.value(val)
+      });
     
+
   },
     addEvents () {
-      this.editor.codemirror.on('keyup',()=>{
-           this.content=this.editor.value()
-      })
-    // this.editor.codemirror.on('keyup',(event)=>{
-    //          if(window.event.code==='Space' || window.event.code==='Enter'){
-    //             // let len=  document.getElementsByClassName('words')[0].innerText
-    //                this.regContent = '发是发斯蒂芬斯蒂芬发缴费is飞机打飞机司法解释低筋粉'
-    //                var reg = /[\u4e00-\u9fa5]/g
-    //                var regValue=this.regContent.match(reg)
-    //                 if(regValue.length<=3){
-
-    //                 }else{
-    //                    var test=this.regContent.split("")
-    //                    var arr = ['粉色','分','粉','粉','粉'];
-    //           var len = test.length;
-    //           for(var i=0;i<5;i++){
-    //              console.log(i)
-    //           //删除掉所有为2的元素
-    //           if(reg.test(test[i])){
-    //             console.log(reg.test(test[i]))
-    //             //注意对比这行代码：删除元素后调整i的值
-    //             test.splice(i--,1);
-    //           }
-    //           }
-    //           console.log(test);
+          
+      var isActive=true
+          this.editor.codemirror.on('keyup',(event)=>{ 
+              var reg = /[\u4e00-\u9fa5a-zA-Z]/g
+              var content=this.editor.value().match(reg)
+              var length=content.length
+             if(isActive){
+  
+              if(length>160){
+                this.$Message.info('超出字数限制(160字数)')
+              this.editor.codemirror.options.readOnly='nocursor'
             
-    //                 }
-                
-    //          }
-    //         })
+                isActive=false
+              }
+             
+             } 
+        
+      })
+ 
       // this.editor.codemirror.on('focus', () => {
       //   this.$emit('on-focus', this.editor.value())
       // })

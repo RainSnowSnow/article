@@ -7,7 +7,7 @@
         </p>
         <div slot="extra" v-show="access==='zj'">
             <ButtonGroup size="small">
-                <Button type="primary" icon="plus" @click="$_addArticle">添加文章</Button>
+                <Button type="primary" icon="plus" @click="modal=true">添加文章</Button>
             </ButtonGroup>
         </div>
       </Card>
@@ -31,7 +31,7 @@
             <Button type="primary"   @click="addArticle('formInline',2)">发布</Button>
         </div>  
       </Modal>
-       <Modal v-model="modifyModal" title="编辑文章" @on-ok="modifySubmit" @on-cancel="modifyCancel">
+       <Modal v-model="modifyModal" title="编辑文章" >
           <Form ref="formInline" :model="formInline" :rules="ruleInline"  :label-width="80">
             <FormItem prop="title" label="标题">
                 <Input  v-model="formInline.title" placeholder="请输入标题"></Input>
@@ -40,9 +40,12 @@
                    <markdown-editor v-model="modifyContent" ref="modifyContent"/> 
                </FormItem>
             </Form>
-              
+          <div slot="footer">
+            <Button type="primary"    @click="modifyArticle('formInline',1,modifyId)">草稿</Button>
+            <Button type="primary"   @click="modifyArticle('formInline',2,modifyId)">发布</Button>
+        </div>
       </Modal>
-       <Modal v-model="downModal" title="下载" @on-ok="downSubmit()" @on-cancel="downCancel">
+       <Modal v-model="downModal" title="下载" @on-ok="downModal===false" @on-cancel="downModal===false">
           <Form ref="formInlineDown" :model="formInlineDown" :rules="ruleInlineDown"  :label-width="120">
             <FormItem prop="title" label="MP4地址">
                 <Input  v-model="formInlineDown.mp4Url" placeholder="请输入mp4的地址"></Input>
@@ -56,7 +59,7 @@
             </Form>
               
       </Modal>
-      <Modal v-model="playModal" title="播放" @on-ok="playSubmit" @on-cancel="playCancel">
+      <Modal v-model="playModal" title="播放" @on-ok="playModal===false" @on-cancel="playModal===false">
           <Form ref="formInlinePlay" :model="formInlinePlay"   :label-width="80">
             <FormItem prop="title" label="MP4地址">
                 <Input  v-model="formInlinePlay.mp4Url" ></Input>
@@ -65,7 +68,7 @@
             </Form>
               
       </Modal>
-      <Modal v-model="madeModal" title="开始制作" @on-ok="MadeSubmit('formInlineMade')" @on-cancel="MadeCancel">
+      <Modal v-model="madeModal" title="开始制作" @on-ok="MadeSubmit('formInlineMade')" @on-cancel="()=>{madeModal===false,$refs['formInlineMade'].resetFields()}">
           <Form ref="formInlineMade" :model="formInlineMade" :rules="ruleInlineMade"  :label-width="120">
             <FormItem prop="mp4Url" label="MP4地址">
                 <Input  v-model="formInlineMade.mp4Url" placeholder="请输入mp4的地址"></Input>
@@ -94,6 +97,8 @@ export default {
   },
     data(){
         return{
+             articleId:null,
+             modifyId:null,
              formInlineMade:{
                 mp4Url:'',
                 baiduPwd:'',
@@ -134,26 +139,26 @@ export default {
             
                 },
                 content: '',
-                modifyContent:null,
+                modifyContent:'ceshihishfidhf',
                 modal:false,
                 modifyModal:false,
                 downModal:false,
                 playModal:false,
                 madeModal:false,
-            formInline: {
+                formInline: {
                     title: '',
                            },
-            ruleInline: {
+                ruleInline: {
                     title: [
                         { required: true, message: '请输入标题', trigger: 'blur' }
                     ],
             
                 },
-            DataCount:0,
-                TablePage: {
-                pageSize: 30,
-                pageSizeOpts: [30, 50, 80, 100]
-            },
+                DataCount:0,
+                    TablePage: {
+                    pageSize: 30,
+                    pageSizeOpts: [30, 50, 80, 100]
+                },
             Columns:[{
                         type: 'index',
                         width: 60,
@@ -238,7 +243,7 @@ export default {
                                     },
                                     on:{
                                         click:()=>{
-                                           this.$_delete()
+                                           this.$_delete(params.row.id)
                                         }
                                         
                                     },
@@ -254,7 +259,7 @@ export default {
                                     },
                                     on:{
                                         click:()=>{
-                                            this.$_fabu()
+                                            this.$_fabu(params.row.id)
                                         }
                                     }
                                      },'发布'),
@@ -265,7 +270,7 @@ export default {
                                     },
                                      style:{
                                         marginRight:'5px',
-                                        display:this.access==='sh1'?"inline-block":"none"
+                                         display:this.access==='sh1'?"inline-block":"none"
                                     },
                                     on:{
                                         click:()=>{
@@ -299,7 +304,7 @@ export default {
                                     },
                                     on:{
                                         click:()=>{
-                                            this.$_down()
+                                            this.$_down(params.row)
                                         }
                                     }
                                      },'下载'),
@@ -314,7 +319,7 @@ export default {
                                     },
                                     on:{
                                         click:()=>{
-                                            this.$_play()
+                                            this.$_play(params.row)
                                         }
                                     }
                                      },'播放'),
@@ -329,7 +334,8 @@ export default {
                                     },
                                     on:{
                                         click:()=>{
-                                         this.$_made()
+                                         this.madeModal=true
+                                         this.articleId=params.row.id
                                         }
                                     }
                                      },'开始制作')
@@ -350,10 +356,7 @@ export default {
          }
     },
         methods:{
-                  /* 添加文章弹窗*/
-                   $_addArticle(){
-                            this.modal=true
-                    },
+              
                     /* 分页*/
                    async  $_TablePageChange (page) {
                     const offset = (page - 1) * this.TablePage.pageSize
@@ -367,7 +370,6 @@ export default {
                     },
                     /* 添加文章 */
                     async addArticle(name,state){
-                        console.log(name)
                        this.$refs[name].validate(async(valid) => {
                          if (valid) {
                              let content=this.$refs.childContent.content
@@ -382,61 +384,60 @@ export default {
                             }
                                     })
                     },
-                    $_addArticle(){
-                        this.modal=true
-                    },
-                    cancel(){
-                     this.$refs['formInline'].resetFields();
-                    },
-                    modifySubmit(){
-                        
-                             this.$refs.modifyContent.content          
-                                         
-                                         },
-                    modifyCancel(){
+                    /* 修改文章 */
+                 async modifyArticle(name,state,id){
+                       this.$refs[name].validate(async(valid) => {
+                         if (valid) {
+                             let content=this.$refs.childContent.content
+                             let title=this.formInline.title
+                             await article.modifyArticle(title,content,state)
+                             await article.getArticle(this,this.TablePage.pageSize,0)
+                           this.modal=false
+                              this.$Message.success('提交成功');
 
+                            } else {
+                                this.$Message.error('提交失败');
+                            }
+                                    })
                     },
-                    $_delete(){
-
+                     $_delete(id){
+                           article.$_deleteArticle(id)
                     },
-                    $_fabu(){
-
+                     $_fabu(id){
+                      article.$_fabu(id)    
                     },
-                    $_down(){
+                    $_down(data){
+                        this.formInlineDown={
+                            mp4Url:data.mp4Url,
+                            baiduPwd:data.baiduPwd,
+                            baiduUrl:data.baiduUrl
+                        }
                         this.downModal=true
                     },
-                    downSubmit(){
-                        this.downModal=false
-                    },
-                    downCancel(){
-                           this.downModal=false
-                    },
-                     playSubmit(){
-                       this.playModal=false
-                    },
-                    playCancel(){
-                        this.playModal=false
-                    },
-                    $_play(){
+                 
+                    $_play(data){
+                       this.formInlinePlay={
+                           mp4Url:data.mp4Url
+                       }
                        this.playModal=true
-                    },
-                    $_made(){
-                         this.madeModal=true
                     },
                     MadeSubmit(name){
                               this.$refs[name].validate((valid) => {
-                        
                                         if (valid) {
+                                          
+                                            article.$_Made(this.articleId,this.formInlineMade)
                                             this.$Message.success('提交成功');
+                                            this.madeModal=true
                                         } else {
-                                            this.$Message.error('提交失败');
+                                            this.$Message.error('请完善信息');
+                                            this.madeModal=false
+                                  
                                         }
                                     })      
                     },
-                    MadeCancel(){
-                         this.madeModal=false
-                    },
+                  
                     $_modify(data){
+                        this.modifyId=data.id
                         this.formInline.title=data.title
                    
                         this.$refs.modifyContent.getContent(data.content)

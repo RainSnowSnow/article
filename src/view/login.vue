@@ -40,6 +40,7 @@ export default {
   name: 'UserLogin',
   data(){
         return{
+          selection:null,
             bgImg : bg,
             form:{
               userName:'',
@@ -80,11 +81,15 @@ export default {
            this.$router.push({
                 name: 'shenhe'
               })
-          }else{
+          }else if(data.rule==='zj') {
             this.$router.push({
                 name: 'articlePage'
               })
           
+          }else{
+                 this.$router.push({
+                name: 'publicPage'
+              })
           }
          
            }catch(error){

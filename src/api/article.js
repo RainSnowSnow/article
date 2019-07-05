@@ -15,7 +15,7 @@ export default {
              })  
           
               vm.Data= data.rows.map((o)=>{
-                if(o.state===6){
+                if(o.state===6 || o.state===2){
                     o['_disabled']=true
                 }
                 return o
@@ -96,6 +96,13 @@ export default {
     async $_shenhe2(id){
         await http.patch({
             url:`/articles/${id}/verify2`,
+        })
+    },
+
+    /* 开始配音 */
+    async $_voice(){
+        await http.patch({
+            url:""
         })
     }
 }

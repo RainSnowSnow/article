@@ -5,15 +5,10 @@
             <Icon type="ios-film-outline"></Icon>
             我的文章
         </p>
-        <div slot="extra" >
-            <ButtonGroup size="small">
-                <Button type="primary" icon="plus"  @click="allCheck" >批量审核</Button>
-            </ButtonGroup>
-        </div>
       </Card>
      <div style="min-height: 200px;">
         <div>
-            <Table border stripe :columns="Columns" :data="Data" @on-selection-change="change"></Table>
+            <Table border stripe :columns="Columns" :data="Data"></Table>
             <Page :total="DataCount"    :page-size="TablePage.pageSize" :page-size-opts="TablePage.pageSizeOpts"  @on-change="$_TablePageChange" @on-page-size-change="$_TablePageSizeChange"  show-total show-elevator show-sizer style="margin-top: 20px; text-align: right;" transfer></Page>
         </div>
      </div>
@@ -41,7 +36,28 @@
             </Form>
               
       </Modal>
- 
+      <Modal v-model="madeModal" title="开始制作" @on-ok="MadeSubmit('formInlineMade')" @on-cancel="()=>{madeModal===false,$refs['formInlineMade'].resetFields()}">
+          <Form ref="formInlineMade" :model="formInlineMade" :rules="ruleInlineMade"  :label-width="120">
+            <FormItem prop="mp4Url" label="MP4地址">
+                <Input  v-model="formInlineMade.mp4Url" placeholder="请输入mp4的地址"></Input>
+            </FormItem>
+               <FormItem prop="baiduUrl" label="百度网盘共享地址">
+                   <Input  v-model="formInlineMade.baiduUrl" placeholder="请输入百度网盘共享地址"></Input>
+               </FormItem>
+                <FormItem prop="baiduPwd" label="百度网盘共享密码">
+                   <Input  v-model="formInlineMade.baiduPwd" placeholder="请输入百度网盘共享地址"></Input>
+               </FormItem>
+            </Form>
+              
+      </Modal>
+         <Modal v-model="voiceModal" title="开始配音" @on-ok="VoiceSubmit('formInlineVoice')" @on-cancel="()=>{voiceModal===false,$refs['formInlineVoice'].resetFields()}">
+          <Form ref="formInlineVoice" :model="formInlineVoice" :rules="ruleInlineVoice"  :label-width="120">
+            <FormItem prop="voice" label="配音地址">
+                <Input  v-model="formInlineVoice.voice" placeholder="请输入配音地址"></Input>
+            </FormItem>
+            </Form>
+              
+      </Modal>
     </div>
 
 </template>
@@ -57,7 +73,15 @@ export default {
   },
     data(){
         return{
-             selection:null,
+            voiceModal:false,
+            formInlineVoice:{
+                voice:null
+            },
+            ruleInlineVoice:{
+                  voice: [
+                        { required: true, message: '请输入配音地址', trigger: 'blur' }
+                    ],
+            },
              articleId:null,
              modifyId:null,
              formInlineMade:{
@@ -100,7 +124,7 @@ export default {
             
                 },
                 content: '',
-                modifyContent:'ceshihishfidhf',
+                modifyContent:'',
                 modal:false,
                 modifyModal:false,
                 downModal:false,
@@ -122,20 +146,16 @@ export default {
                 },
             Columns:[
                   {
-                        type: 'selection',
-                        width: 60,
-                        align: 'center',
-                      
-                    },
-                  {
                         type: 'index',
                         width: 60,
                         align: 'center'
+                   
                     },
                          {
                              title:'标题',
                              key:'title',
                              align: 'center',
+                         
                          },{
                              title:'发布日期',
                              key:'publishedAt',
@@ -152,10 +172,10 @@ export default {
                               render:(h,params)=>{
                                   return h('div',[
                                       h('span',{
-                                         style:{
-                                              display:params.row.state===9?'block':'none'
+                                          style:{
+                                              display:params.row.state===3?'block':'none'
                                           }
-                                      },'已审核,等待制作'),
+                                      },'已审核'),
                                        h('span',{
                                           style:{
                                               display:params.row.state===1?'block':'none'
@@ -175,13 +195,23 @@ export default {
                                           style:{
                                               display:params.row.state===5?'block':'none'
                                           }
-                                      },'已完成'),
-                                        h('span',{
+                                      },'已完成制作'),
+                                         h('span',{
                                           style:{
                                               display:params.row.state===6?'block':'none'
                                           }
                                       },'已通过'),
-                                        h('span',{
+                                       h('span',{
+                                          style:{
+                                              display:params.row.state===7?'block':'none'
+                                          }
+                                      },'已开始配音'),
+                                              h('span',{
+                                          style:{
+                                              display:params.row.state===8?'block':'none'
+                                          }
+                                      },'已完成配音'),
+                                         h('span',{
                                           style:{
                                               display:params.row.state===9?'block':'none'
                                           }
@@ -276,11 +306,12 @@ export default {
                                         display:this.access==='sh2'?"inline-block":"none"
                                     },
                                      on:{
-                                        click:()=>{
-                                            this.$_shenhe2()
+                                        click:async ()=>{
+                                           await article.$_shenhe2(params.row.id)
+                                           await article.getArticle(this,this.TablePage.pageSize,0)   
                                         }
                                     },
-                                     },'审核2'),
+                                     },'终极审核'),
                                         h('Button',{
                                        props: {
                                         type: 'primary',
@@ -318,15 +349,42 @@ export default {
                                     },
                                      style:{
                                         marginRight:'5px',
-                                        display:this.access==='zz'?"inline-block":'none'
+                                        display:this.access==='zz'&& params.row.state===5?"inline-block":'none'
                                     },
                                     on:{
                                         click:()=>{
+                                            if(params.row.baiduPwd!=''){
+                                                this.formInlineMade={
+                                                    mp4Url:params.row.mp4Url,
+                                                    baiduUrl:params.row.baiduUrl,
+                                                    baiduPwd:params.row.baiduPwd
+                                                }
+                                            }
                                          this.madeModal=true
                                          this.articleId=params.row.id
                                         }
                                     }
-                                     },'开始制作')
+                                     },params.row.state===5?'上传视频':"开始制作"),
+                                  h('Button',{
+                                      props:{
+                                        type: 'primary',
+                                        size: 'small'
+                                      },
+                                      style:{
+                                          display:'inline-block'
+                                      },
+                                      on:{
+                                          click:()=>{
+                                              if(params.row.voice!=''){
+                                                  this.formInlineVoice={
+                                                      voice:params.row.voice
+                                                  }
+                                              }
+                                             this.voiceModal=true
+                                          }
+                                      }
+                                  },'开始配音')
+
                                  ] )
                              }
                          }
@@ -344,21 +402,7 @@ export default {
          }
     },
         methods:{
-            change(selection){
-                this.selection=selection
-                console.log(selection)
-            },
-            /* 批量审核 */
-              async allCheck(){
-                  if(this.selection==='null'){
-                      this.$Message.info('您还没有选中项')
-                   }else{
-                      for(var i=0;i<this.selection.length;i++){
-                         await  article.$_shenhe1(this.selection[i].id)
-                         await article.getArticle(this,this.TablePage.pageSize,0)
-                      } 
-                   }
-              },
+              
                     /* 分页*/
                    async  $_TablePageChange (page) {
                     const offset = (page - 1) * this.TablePage.pageSize
@@ -370,7 +414,7 @@ export default {
                      await article.getArticle(this,this.TablePage.pageSize,0)
                     
                     },
-                  
+                    
             
                     $_down(data){
                         this.formInlineDown={
@@ -386,9 +430,44 @@ export default {
                            mp4Url:data.mp4Url
                        }
                        this.playModal=true
-                    }
+                    },
+                    MadeSubmit(name){
+                              this.$refs[name].validate(async(valid) => {
+                                        if (valid) {
+                                          
+                                            await  article.$_Made(this.articleId,this.formInlineMade)
+                                            await  article.getArticle(this,this.TablePage.pageSize,0)
+
+                                            this.madeModal=false
+                                        } else {
+                                            this.$Message.error('请完善信息');
+                                            this.madeModal=true
+                                  
+                                        }
+                                    })      
+                    },
+                  VoiceSubmit(name){
+                           this.$refs[name].validate(async(valid) => {
+                                        if (valid) {
+                                          
+                                            // await  article.$_Made(this.articleId,this.formInlineMade)
+                                            await  article.getArticle(this,this.TablePage.pageSize,0)
+                                         } else {         
+                                           
+                                            this.$Message.error('请完善信息');
+                                   
+                                  
+                                        }
+                                    })
+                  },
+                    $_modify(data){
+                        this.modifyId=data.id
+                        this.formInline.title=data.title
+                   
+                        this.$refs.modifyContent.getContent(data.content)
                   
-              
+                        this.modifyModal=true
+                    }
 
           }
 

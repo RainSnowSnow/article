@@ -46,6 +46,17 @@ export default new Router({
         component: () =>
           import ('@/view/shenheArticle.vue')
       }],
+    },
+    {
+      path: '/public',
+      name: 'Main',
+      component: Main,
+      children:[{
+        name:"publicPage",
+        path:'publicPage',
+        component: () =>
+          import ('@/view/publicPage.vue')
+      }],
     }
   ]
 })

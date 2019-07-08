@@ -288,38 +288,7 @@ export default {
                                         }
                                     }
                                      },'发布'),
-                                            h('Button',{
-                                       props: {
-                                        type: 'primary',
-                                        size: 'small'
-                                    },
-                                     style:{
-                                        marginRight:'5px',
-                                         display:this.access==='sh1'?"inline-block":"none"
-                                    },
-                                    on:{
-                                        click:async ()=>{
-                                             await article.$_shenhe1(params.row.id)
-                                              await article.getArticle(this,this.TablePage.pageSize,0)   
-                                        }
-                                    },
-                                     },'审核1'),
-                                      h('Button',{
-                                       props: {
-                                        type: 'primary',
-                                        size: 'small'
-                                    },
-                                     style:{
-                                        marginRight:'5px',
-                                        display:this.access==='sh2'?"inline-block":"none"
-                                    },
-                                     on:{
-                                        click:async ()=>{
-                                           await article.$_shenhe2(params.row.id)
-                                           await article.getArticle(this,this.TablePage.pageSize,0)   
-                                        }
-                                    },
-                                     },'终极审核'),
+                                    
                                         h('Button',{
                                        props: {
                                         type: 'primary',
@@ -357,22 +326,22 @@ export default {
                                     },
                                      style:{
                                         marginRight:'5px',
-                                        display:this.access==='zz'&& params.row.state===5?"inline-block":'none'
+                                        display:this.access==='zz'?"inline-block":'none'
                                     },
                                     on:{
                                         click:()=>{
                                             if(params.row.baiduPwd!=''){
                                                 this.formInlineMade={
-                                                    mp4Url:params.row.mp4Url,
-                                                    baiduUrl:params.row.baiduUrl,
-                                                    baiduPwd:params.row.baiduPwd
+                                                    mp4Url:params.row.mp4_url,
+                                                    baiduUrl:params.row.baidu_url,
+                                                    baiduPwd:params.row.baidu_pwd
                                                 }
                                             }
                                          this.madeModal=true
                                          this.articleId=params.row.id
                                         }
                                     }
-                                     },params.row.state===5?'上传视频':"开始制作"),
+                                     },params.row.state===4?'开始制作':"上传视频"),
                                   h('Button',{
                                       props:{
                                         type: 'primary',
@@ -380,7 +349,7 @@ export default {
                                         disabled:params.row.state!==7?true:false
                                       },
                                       style:{
-                                          display:'inline-block'
+                                          display:this.access==='py'?'inline-block':"none"
                                       },
                                       on:{
                                           click:()=>{
@@ -431,17 +400,18 @@ export default {
                     
             
                     $_down(data){
+                        console.log(data)
                         this.formInlineDown={
-                            mp4Url:data.mp4Url,
-                            baiduPwd:data.baiduPwd,
-                            baiduUrl:data.baiduUrl
+                            mp4Url:data.mp4_url,
+                            baiduPwd:data.baidu_pwd,
+                            baiduUrl:data.baidu_url
                         }
                         this.downModal=true
                     },
                  
                     $_play(data){
                        this.formInlinePlay={
-                           mp4Url:data.mp4Url
+                           mp4Url:data.mp4_url
                        }
                        this.playModal=true
                     },

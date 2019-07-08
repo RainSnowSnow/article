@@ -281,11 +281,12 @@ export default {
                                         display:this.access==='sh2'?"inline-block":"none"
                                     },
                                      on:{
-                                        click:()=>{
-                                            this.$_shenhe2()
+                                        click:async ()=>{
+                                           await article.$_shenhe2(params.row.id)
+                                           await article.getArticle(this,this.TablePage.pageSize,0)   
                                         }
                                     },
-                                     },'审核2'),
+                                     },'终极审核'),
                                         h('Button',{
                                        props: {
                                         type: 'primary',
@@ -355,14 +356,22 @@ export default {
             },
             /* 批量审核 */
               async allCheck(){
-                  if(this.selection==='null'){
+                  if(this.selection===null){
                       this.$Message.info('您还没有选中项')
                    }else{
-                      for(var i=0;i<this.selection.length;i++){
-                         await  article.$_shenhe1(this.selection[i].id)
+                        if(this.access==='sh1'){
+                             for(var i=0;i<this.selection.length;i++){
+                              await  article.$_shenhe1(this.selection[i].id)
+                              }
+                        }else{
+                             for(var i=0;i<this.selection.length;i++){
+                              await  article.$_shenhe2(this.selection[i].id)
+                              }
+                        }
+                    
                          await article.getArticle(this,this.TablePage.pageSize,0)
                       } 
-                   }
+                   
               },
                     /* 分页*/
                    async  $_TablePageChange (page) {

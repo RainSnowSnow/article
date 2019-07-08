@@ -77,7 +77,7 @@ export default {
    
             Util.setToken(data.token)
             this.$store.commit('setAccess',data.rule)
-          if(data.rule==='sh1'){
+          if(data.rule==='sh1' || data.rule==='sh2'){
            this.$router.push({
                 name: 'shenhe'
               })

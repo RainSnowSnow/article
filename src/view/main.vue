@@ -70,7 +70,7 @@ import * as Util from '@/libs/util.js'
 <style>
 #app{margin-top:0}
 .LogOut{
-    position: fixed;
+    position: absolute;
     right: 20px;
     top:0;
     bottom:0;

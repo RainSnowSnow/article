@@ -15,10 +15,26 @@ export default {
              })  
           
               vm.Data= data.rows.map((o)=>{
-                if(o.state===6 || o.state===2){
-                    o['_disabled']=true
+                if(vm.$store.state.access==='sh1'){
+                    if(o.state!==2 ){
+                        o['_disabled']=true
+                     }
+                    return o
+                }else if(vm.$store.state.access==='zj'){
+                    if(o.state!==1 ){
+                        o['_disabled']=true
+                     }
+                    return o
+                }else if(vm.$store.state.access==='sh2'){
+                    if(o.state===6 ){
+                        o['_disabled']=true
+                     }
+                    return o
+                }else{
+                    return o
                 }
-                return o
+
+    
            })
               vm.DataCount=data.count
      } catch(error){
@@ -88,7 +104,7 @@ export default {
             })
             iview.$Message.info('审核成功')
         }catch(error){
-            console.log('审核失败')
+            console.log(error)
         }
      
     },

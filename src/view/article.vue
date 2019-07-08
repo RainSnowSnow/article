@@ -100,6 +100,7 @@ export default {
         return{
              articleId:null,
              modifyId:null,
+             selection:null,
              formInlineMade:{
                 mp4Url:'',
                 baiduPwd:'',
@@ -197,7 +198,7 @@ export default {
                                           style:{
                                               display:params.row.state===9?'block':'none'
                                           }
-                                      },'已审核,等待制作'),
+                                      },'等待分配制作人员'),
                                        h('span',{
                                           style:{
                                               display:params.row.state===1?'block':'none'
@@ -420,28 +421,47 @@ export default {
                     async addArticle(name,state){
                        this.$refs[name].validate(async(valid) => {
                          if (valid) {
-                             let content=this.$refs.childContent.content
-                             let title=this.formInline.title
-                             await article.addArticle(title,content,state)
-                             await article.getArticle(this,this.TablePage.pageSize,0)
-                           this.modal=false
-                              this.$Message.success('提交成功');
+                              let content=this.$refs.childContent.content
+                                var reg = /[\u4e00-\u9fa5a-zA-Z]/g
+                                if(content){
+                                 var length=content.length
+                                   if(length>160){
+                                         this.$Message.success('超出限定字数(160字)');
+                                   }else{
+                                     let title=this.formInline.title
+                                    await article.addArticle(title,content,state)
+                                    await article.getArticle(this,this.TablePage.pageSize,0)
+                                    this.modal=false
+                                    this.$Message.success('提交成功');
+                                        this.formInline.title=''
+                                  this.$refs.childContent.getContent('')
 
+                                   }
+                                }
                             } else {
                                 this.$Message.error('提交失败');
                             }
                                     })
+                      
                     },
                     /* 修改文章 */
                  async modifyArticle(name,state,id){
                        this.$refs[name].validate(async(valid) => {
                          if (valid) {
                              let content=this.$refs.modifyContent.content
-                             let title=this.formInline.title
-                             await article.modifyArticle(id,title,content)
-                             await article.getArticle(this,this.TablePage.pageSize,0)
-                               this.modifyModal=false
-                              this.$Message.success('提交成功');
+                               var reg = /[\u4e00-\u9fa5a-zA-Z]/g
+                                if(content){
+                                 var length=content.length
+                                   if(length>160){
+                                         this.$Message.success('超出限定字数(160字)');
+                                   }else{
+                                   let title=this.formInline.title
+                                    await article.modifyArticle(id,title,content)
+                                    await article.getArticle(this,this.TablePage.pageSize,0)
+                                    this.modifyModal=false
+                                    this.$Message.success('提交成功');
+                                   }
+                                 }
 
                             } else {
                                 this.$Message.error('提交失败');
@@ -492,7 +512,7 @@ export default {
                           if(this.selection===null){
                               this.$Message.info('您还没有选择要发布的项目')
                           }  else{
-                             for(var i=0;i<=this.selection.length;i++){
+                             for(var i=0;i<this.selection.length;i++){
                                 await article.$_fabu(this.selection[i].id)
                                
                              }

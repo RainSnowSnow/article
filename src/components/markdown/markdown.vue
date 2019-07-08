@@ -1,6 +1,7 @@
 <template>
   <div class="markdown-wrapper">
     <textarea ref="editor"   ></textarea>
+    <div>{{length}}字</div>
   </div>
 </template>
 
@@ -66,22 +67,34 @@ export default {
     addEvents () {
           
       var isActive=true
-          this.editor.codemirror.on('keyup',(event)=>{ 
+          this.editor.codemirror.on('keyup',(event)=>{
+            
               var reg = /[\u4e00-\u9fa5a-zA-Z]/g
               var content=this.editor.value().match(reg)
               this.content=this.editor.value()
- 
+               if(content){
               var length=content.length
-             if(isActive){
+                  this.length=length
   
               if(length>160){
-                this.$Message.info('超出字数限制(s160字数)')
-                 this.editor.codemirror.options.readOnly='nocursor'
-            
-                isActive=false
+               
+                  if(window.event.code==='Backspace' || window.event.code==='Delete'){
+                   isActive=true 
+                 
+                  this.editor.codemirror.options.readOnly=false
+              
+                }else{    
+                    if(isActive){
+                      this.$Message.info('超出字数限制(160字数)') }
+                     
+                       isActive=false
+                    
+  
               }
+                
              
-             } 
+             } }
+     
         
       })
  

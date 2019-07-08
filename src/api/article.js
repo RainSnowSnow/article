@@ -99,10 +99,11 @@ export default {
         })
     },
 
-    /* 开始配音 */
-    async $_voice(){
+    /* 配音完成制作 */
+    async $_voice(id,query){
         await http.patch({
-            url:""
+            url:`/articles/${id}/pyend`,
+            data:query
         })
     }
 }

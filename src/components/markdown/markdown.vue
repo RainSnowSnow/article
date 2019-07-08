@@ -70,11 +70,12 @@ export default {
               var reg = /[\u4e00-\u9fa5a-zA-Z]/g
               var content=this.editor.value().match(reg)
               this.content=this.editor.value()
+ 
               var length=content.length
              if(isActive){
   
               if(length>160){
-                this.$Message.info('超出字数限制(160字数)')
+                this.$Message.info('超出字数限制(s160字数)')
                  this.editor.codemirror.options.readOnly='nocursor'
             
                 isActive=false

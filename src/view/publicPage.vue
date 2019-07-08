@@ -52,8 +52,13 @@
       </Modal>
          <Modal v-model="voiceModal" title="开始配音" @on-ok="VoiceSubmit('formInlineVoice')" @on-cancel="()=>{voiceModal===false,$refs['formInlineVoice'].resetFields()}">
           <Form ref="formInlineVoice" :model="formInlineVoice" :rules="ruleInlineVoice"  :label-width="120">
+            <FormItem prop="voice" label="上传配音">
+             <Upload ref="upload" :show-upload-list="false" action="http://192.168.0.201:8080/upload"  :on-success="handleSuccess"    :format="['mp4','mp3']" name="uploadfile"  :headers='headers' >
+              <Button icon="ios-cloud-upload-outline" type="primary">上传配音</Button><span style="color:red"> 文件只能为(mp4/mp3)</span>
+            </Upload>
+             </FormItem>
             <FormItem prop="voice" label="配音地址">
-                <Input  v-model="formInlineVoice.voice" placeholder="请输入配音地址"></Input>
+                <Input  v-model="formInlineVoice.voice" placeholder="上传的配音地址"></Input>
             </FormItem>
             </Form>
               
@@ -65,6 +70,7 @@
 import MarkdownEditor from '@/components/markdown'
 import article from  '@/api/article.js'
 import moment from 'moment'
+import * as Util from '@/libs/util.js'
 import { access } from 'fs';
 import { async } from 'q';
 export default {
@@ -74,9 +80,11 @@ export default {
     data(){
         return{
             voiceModal:false,
+            voiceId:null,
             formInlineVoice:{
                 voice:null
             },
+            headers:null,
             ruleInlineVoice:{
                   voice: [
                         { required: true, message: '请输入配音地址', trigger: 'blur' }
@@ -368,18 +376,20 @@ export default {
                                   h('Button',{
                                       props:{
                                         type: 'primary',
-                                        size: 'small'
+                                        size: 'small',
+                                        disabled:params.row.state!==7?true:false
                                       },
                                       style:{
                                           display:'inline-block'
                                       },
                                       on:{
                                           click:()=>{
-                                              if(params.row.voice!=''){
+                                              if(params.row.py_url!=''){
                                                   this.formInlineVoice={
-                                                      voice:params.row.voice
+                                                      voice:params.row.py_url
                                                   }
                                               }
+                                              this.voiceId=params.row.id
                                              this.voiceModal=true
                                           }
                                       }
@@ -393,6 +403,10 @@ export default {
         }
     },
     async created (){
+
+        this.headers={
+            'Authorization':'Bearer '+ Util.getToken('token')
+        }
       await article.getArticle(this,this.TablePage.pageSize,0)
        
     },
@@ -446,11 +460,14 @@ export default {
                                         }
                                     })      
                     },
-                  VoiceSubmit(name){
+                    VoiceSubmit(name){
                            this.$refs[name].validate(async(valid) => {
                                         if (valid) {
-                                          
-                                            // await  article.$_Made(this.articleId,this.formInlineMade)
+                                            let query={
+                                               pyUrl:this.formInlineVoice.voice
+                                            }
+                                            await article.$_voice(this.voiceId,query ) 
+                            
                                             await  article.getArticle(this,this.TablePage.pageSize,0)
                                          } else {         
                                            
@@ -459,6 +476,10 @@ export default {
                                   
                                         }
                                     })
+                  },
+                  handleSuccess(res){
+
+                       this.formInlineVoice.voice='http://192.168.0.201:8080'+res.data.path
                   },
                     $_modify(data){
                         this.modifyId=data.id

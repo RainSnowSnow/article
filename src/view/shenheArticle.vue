@@ -186,11 +186,16 @@ export default {
                                               display:params.row.state===9?'block':'none'
                                           }
                                       },'等待分配制作人员'),
-                                              h('span',{
+                                                h('span',{
                                           style:{
                                               display:params.row.state===10?'block':'none'
                                           }
-                                      },'等待分配制作人员')
+                                      },'等待分配配音人员'),
+                                       h('span',{
+                                          style:{
+                                              display:params.row.state===7?'block':'none'
+                                          }
+                                      },'已开始配音')
                                   ])
                               }
                          },{

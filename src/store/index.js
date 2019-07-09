@@ -6,11 +6,15 @@ import Cookies from 'js-cookie'
 Vue.use(Vuex)
 const store = new Vuex.Store({  
     state: {  
-        access:'',
+        access:null,
+        account:null
     },  
     mutations: {
         setAccess(state,data){
             state.access=data
+        },
+        setAccount(state,data){
+            state.account=data
         }
     } ,
     plugins: [

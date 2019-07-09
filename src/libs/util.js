@@ -5,7 +5,8 @@ import Cookies from 'js-cookie'
 export const TOKEN_KEY = 'token'
 
 export const setToken = (token) => {
-  Cookies.set(TOKEN_KEY, token, {expires: 1 || 1})
+  var inFifteenMinutes = new Date(new Date().getTime() + 1 * 60 * 1000)
+  Cookies.set(TOKEN_KEY, token, { expires:inFifteenMinutes })
 }
 
 export const getToken = () => {

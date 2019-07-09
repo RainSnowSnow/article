@@ -102,7 +102,7 @@ export default {
             await http.patch({
                 url:`/articles/${id}/verify1`,
             })
-            iview.$Message.info('审核成功')
+            iview.Message.info('审核成功')
         }catch(error){
             console.log(error)
         }
@@ -121,5 +121,17 @@ export default {
             url:`/articles/${id}/pyend`,
             data:query
         })
+    },
+    /* 修改密码 */
+    async $_changePassword(query,vm){
+        try{
+            await http.put({
+                url:`/auth/password/change/my`,
+                data:query
+            })
+   
+         vm.loginAgain=true
+        }catch(error){console.log(error)}
+   
     }
 }

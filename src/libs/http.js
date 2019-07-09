@@ -4,6 +4,7 @@ import config from '@/config'
 import * as Util from '@/libs/util'
 import Cookie from 'js-cookie'
 import iview from 'iview'
+import store from '@/store'
 const baseUrl = config.baseUrl
 const axios = Axios.create({
   baseURL: baseUrl,
@@ -29,6 +30,7 @@ function ajax (options) {
 
       if (res.status === 200) {
          if (res.data.code === 0) {
+           
           resolve(res.data.data)
         } else {
           Cookie.set('error', res.data.msg)
@@ -40,6 +42,22 @@ function ajax (options) {
           reject(new Error(res.status))
       }
     }).catch(err => {
+      if(err.response.status===401){
+        let token=Util.getToken()
+        if(!token){
+          let query=store.state.account
+         http.post({
+           url:'/auth/login',
+           data:query
+         }).then((res)=>{
+          Util.setToken(res.token)
+          window.location.reload()
+         })
+   
+        
+        }
+      }
+    
       if (reject) {
         reject(err)
       }

@@ -38,7 +38,7 @@ export default {
             telphone:telphone    
             }
         })
-        iview.Message.info('修改成功')
+        iview.Message.info('信息修改成功')
        }catch(error){
          console.log(error)
        }
@@ -57,7 +57,7 @@ export default {
                upwd:upwd
              }
            })
-           iview.Message.info('修改成功')
+           iview.Message.info('密码修改成功')
      }catch(error){
            console.log(error)
      } 

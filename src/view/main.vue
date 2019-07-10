@@ -96,7 +96,7 @@ import md5 from 'md5'
                   this.$refs[name].validate(async (valid)=>{
                       if(valid){
                             let query={
-                                    upwd:this.formInline.password
+                                    upwd:md5(this.formInline.password)
                                 }
                             await  article.$_changePassword(query,this)
                             
@@ -109,12 +109,12 @@ import md5 from 'md5'
 
               },
               sure(){
-                   Util.setToken('')
-                   this.$store.commit('setAccount','')
+                    Util.setToken('')
+                    this.$store.commit('setAccount','')
                     this.$store.commit('setAccess','')
-                  this.$router.push({
-                      name:'login'
-                  })
+                    this.$router.push({
+                        name:'login'
+                    })
               }
           }
        

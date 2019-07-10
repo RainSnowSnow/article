@@ -54,6 +54,7 @@
 </template>
 <script>
 import profession from '@/api/profession.js'
+import md5 from 'md5'
 export default {
   data(){
     return {
@@ -205,7 +206,7 @@ export default {
     $passwordModal(name){
       this.$refs[name].validate(async(valid) => {
             if (valid) {
-                await   profession.modifyUserPassword(this.userId,this.formInlineUpwd.upwd)
+                await   profession.modifyUserPassword(this.userId,md5(this.formInlineUpwd.upwd))
                 this.profession()
                this.passwordModal=false
             } else {
@@ -219,8 +220,9 @@ export default {
              limit:this.TablePage.pageSize,
              offset:offset
          }
-        await profession.getExperts(query)
-    
+        
+       const data= await profession.getExperts(query)
+         this.Data=data.rows
         },
         async $_TablePageSizeChange (pageSize) {
             this.TablePage.pageSize = pageSize
@@ -228,7 +230,8 @@ export default {
              limit:this.TablePage.pageSize,
              offset:0
          }
-            await profession.getExperts(query)
+          const data=  await profession.getExperts(query)
+           this.Data=data.rows
         },
   }
 }

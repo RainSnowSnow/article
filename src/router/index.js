@@ -2,10 +2,12 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import UserLogin from '@/view/login.vue'
 import Main from '@/view/main.vue'
-
+import * as Util  from '@/libs/util.js' 
+import http from '@/libs/http.js'
+import store from '@/store'
 Vue.use(Router)
 
-export default new Router({
+const router= new Router({
   routes: [
     {
       path: '/',
@@ -60,3 +62,28 @@ export default new Router({
     }
   ]
 })
+router.beforeEach((to,from,next)=>{
+
+  let token=Util.getToken()
+   let data=store.state.account
+  if(to.name ==='login'){
+    next()
+  }else{
+    if(( to.name !=='login' && token)){
+      next()
+    }else{
+   
+      http.post({
+        url:'/auth/login',
+        data:data
+      }).then(res=>{
+        Util.setToken(res.token)
+        next({
+          name:to.name
+        })
+       
+      })
+    }
+  }
+})
+export default router

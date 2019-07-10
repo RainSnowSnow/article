@@ -42,21 +42,21 @@ function ajax (options) {
           reject(new Error(res.status))
       }
     }).catch(err => {
-      if(err.response.status===401){
-        let token=Util.getToken()
-        if(!token){
-          let query=store.state.account
-         http.post({
-           url:'/auth/login',
-           data:query
-         }).then((res)=>{
-          Util.setToken(res.token)
-          window.location.reload()
-         })
+      // if(err.response.status===401){
+      //   let token=Util.getToken()
+      //   if(!token){
+      //     let query=store.state.account
+      //    http.post({
+      //      url:'/auth/login',
+      //      data:query
+      //    }).then((res)=>{
+      //     Util.setToken(res.token)
+      //     window.location.reload()
+      //    })
    
         
-        }
-      }
+      //   }
+      // }
     
       if (reject) {
         reject(err)

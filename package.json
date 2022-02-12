@@ -14,7 +14,7 @@
     "build": "node build/build.js"
   },
   "dependencies": {
-    "ajv": "^5.0.0",
+    "ajv": "^6.12.3",
     "axios": "^0.19.0",
     "js-cookie": "^2.2.0",
     "md5": "^2.2.1",
